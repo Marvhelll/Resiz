@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#e1306c">
   <meta name="description" content="Redimensionne tes photos au format carré Instagram">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
   <title>Instagram Resizer</title>
 </head>
 <body>
@@ -21,131 +21,134 @@
         </svg>
         <span>Instagram Resizer</span>
       </div>
-      <button id="btn-install" class="btn btn-outline" hidden>
-        Installer l'app
-      </button>
+      <button id="btn-install" class="btn btn-outline" hidden>Installer l'app</button>
     </div>
   </header>
 
   <main>
 
-    <!-- Zone drop / import (visible avant import) -->
-    <section id="drop-zone" aria-label="Zone d'import d'image">
-      <input type="file" id="file-input" accept="image/*" aria-label="Choisir une image">
+    <!-- ── Drop zone (état initial) ── -->
+    <section id="drop-zone" aria-label="Zone d'import">
+      <input type="file" id="file-input" accept="image/*" multiple aria-label="Choisir des images">
       <div class="drop-content">
         <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
           <polyline points="17 8 12 3 7 8"/>
           <line x1="12" y1="3" x2="12" y2="15"/>
         </svg>
-        <p class="drop-title">Glisse une image ici</p>
+        <p class="drop-title">Glisse tes images ici</p>
         <p class="drop-sub">ou</p>
-        <button class="btn btn-primary" id="btn-pick">Choisir une image</button>
-        <p class="drop-formats">JPG, PNG, WEBP, HEIC...</p>
+        <button class="btn btn-primary" id="btn-pick">Choisir des images</button>
+        <p class="drop-formats">JPG, PNG, WEBP, HEIC… · Plusieurs fichiers acceptés</p>
       </div>
     </section>
 
-    <!-- Zone édition (cachée avant import) -->
-    <section id="editor" hidden>
+    <!-- ── Éditeur batch (caché au départ) ── -->
+    <div id="editor" hidden>
 
-      <!-- Canvas de prévisualisation -->
-      <div class="canvas-wrapper">
-        <canvas id="preview" width="480" height="480" aria-label="Prévisualisation de l'image"></canvas>
-        <button class="btn-change" id="btn-change" title="Changer d'image">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="17 8 12 3 7 8"/>
-            <line x1="12" y1="3" x2="12" y2="15"/>
+      <!-- Sidebar : liste des vignettes -->
+      <aside id="sidebar">
+        <div id="thumb-list"></div>
+        <button id="btn-add" class="btn-add-more" title="Ajouter des images">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
-          Changer d'image
+          Ajouter
         </button>
+      </aside>
+
+      <!-- Canvas : carousel -->
+      <div id="canvas-area">
+        <div id="carousel-nav">
+          <button id="btn-prev" class="btn-nav" aria-label="Image précédente">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <span id="carousel-counter">1 / 1</span>
+          <button id="btn-next" class="btn-nav" aria-label="Image suivante">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <div class="canvas-wrapper">
+          <canvas id="preview" width="480" height="480" aria-label="Prévisualisation"></canvas>
+        </div>
+
+        <p class="drag-hint">Tu peux glisser d'autres images ici pour les ajouter</p>
       </div>
 
-      <!-- Panneau de contrôles -->
+      <!-- Contrôles fixes -->
       <div id="controls">
 
-        <!-- Zoom -->
         <div class="control-group">
-          <label class="control-label" for="zoom-slider">
+          <label class="control-label">
             Zoom
             <span id="zoom-label" class="control-value">100%</span>
           </label>
           <div class="slider-row">
             <span class="slider-bound">10%</span>
-            <input
-              type="range"
-              id="zoom-slider"
-              min="10"
-              max="200"
-              step="1"
-              value="100"
-              aria-label="Zoom en pourcentage"
-            >
+            <input type="range" id="zoom-slider" min="10" max="200" step="1" value="100" aria-label="Zoom">
             <span class="slider-bound">200%</span>
           </div>
-          <button class="btn btn-ghost btn-sm" id="btn-reset-zoom">
-            Remettre à 100%
-          </button>
+          <button id="btn-reset-zoom" class="btn btn-ghost btn-sm">Remettre à 100%</button>
         </div>
 
         <div class="divider"></div>
 
-        <!-- Taille d'export -->
         <div class="control-group">
-          <label class="control-label" for="export-size">
-            Taille d'export
-          </label>
-          <select id="export-size" aria-label="Taille d'export en pixels">
+          <label class="control-label">Taille d'export</label>
+          <select id="export-size" aria-label="Taille en pixels">
             <option value="1080">1080 px — standard Instagram</option>
             <option value="1200">1200 px — haute qualité</option>
             <option value="1500">1500 px — très haute qualité</option>
             <option value="custom">Personnalisé...</option>
           </select>
           <div id="custom-size-wrapper" hidden>
-            <input
-              type="number"
-              id="custom-size"
-              min="100"
-              max="5000"
-              placeholder="ex : 800"
-              aria-label="Taille personnalisée en pixels"
-            >
+            <input type="number" id="custom-size" min="100" max="5000" placeholder="ex : 800" aria-label="Taille personnalisée">
             <span class="input-unit">px</span>
           </div>
         </div>
 
         <div class="divider"></div>
 
-        <!-- Boutons export -->
         <div class="control-group">
-          <label class="control-label">Télécharger</label>
-          <div class="export-buttons">
-            <button class="btn btn-primary" id="btn-jpg">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              JPG
-            </button>
-            <button class="btn btn-outline" id="btn-png">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              PNG
-            </button>
+          <label class="control-label">Format</label>
+          <div class="format-radio">
+            <label class="radio-label">
+              <input type="radio" name="format" value="jpg" checked> JPG
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="format" value="png"> PNG
+            </label>
           </div>
-          <p class="export-info" id="export-info">Export : 1080 × 1080 px</p>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="control-group">
+          <button id="btn-zip" class="btn btn-primary btn-zip">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span id="btn-zip-label">Télécharger ZIP</span>
+          </button>
+          <button id="btn-single" class="btn btn-outline btn-sm">
+            Photo en cours seulement
+          </button>
+          <p id="export-info" class="export-info">Export : 1080 × 1080 px</p>
         </div>
 
       </div>
-    </section>
+    </div>
 
   </main>
 
-  <script src="app.js?v=3"></script>
+  <!-- Inputs fichiers cachés -->
+  <input type="file" id="file-input-add" accept="image/*" multiple hidden>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="app.js?v=4"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
