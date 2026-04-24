@@ -1,6 +1,6 @@
 {
-  "name": "Instagram Resizer",
-  "short_name": "IGResize",
+  "name": "Resiz",
+  "short_name": "Resiz",
   "description": "Redimensionne tes photos au format carré Instagram avec fond blanc",
   "start_url": "./",
   "display": "standalone",
@@ -9,6 +9,12 @@
   "orientation": "portrait",
   "lang": "fr",
   "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",

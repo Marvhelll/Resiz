@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e1306c"/>
+      <stop offset="100%" stop-color="#405de6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fond arrondi -->
+  <rect width="100" height="100" rx="22" fill="url(#bg)"/>
+
+  <!-- Cadre photo -->
+  <rect x="15" y="27" width="43" height="34" rx="5"
+        stroke="white" stroke-width="5.5" fill="none"/>
+
+  <!-- Flèche haut-droite -->
+  <path d="M64 15 H83 V34"
+        stroke="white" stroke-width="5.5"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Flèche bas-gauche -->
+  <path d="M36 85 H17 V66"
+        stroke="white" stroke-width="5.5"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

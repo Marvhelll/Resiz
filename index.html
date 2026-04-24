@@ -6,20 +6,33 @@
   <meta name="theme-color" content="#e1306c">
   <meta name="description" content="Redimensionne tes photos au format carré Instagram">
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
   <link rel="stylesheet" href="styles.css?v=4">
-  <title>Instagram Resizer</title>
+  <title>Resiz</title>
 </head>
 <body>
 
   <header>
     <div class="header-inner">
       <div class="logo">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <rect x="3" y="3" width="18" height="18" rx="5"/>
-          <circle cx="12" cy="12" r="4"/>
-          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        <svg width="28" height="28" viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#e1306c"/>
+              <stop offset="100%" stop-color="#405de6"/>
+            </linearGradient>
+          </defs>
+          <rect width="100" height="100" rx="22" fill="url(#logoGrad)"/>
+          <rect x="15" y="27" width="43" height="34" rx="5"
+                stroke="white" stroke-width="6" fill="none"/>
+          <path d="M64 15 H83 V34"
+                stroke="white" stroke-width="6"
+                stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M36 85 H17 V66"
+                stroke="white" stroke-width="6"
+                stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
-        <span>Instagram Resizer</span>
+        <span>Resiz</span>
       </div>
       <button id="btn-install" class="btn btn-outline" hidden>Installer l'app</button>
     </div>
