@@ -306,13 +306,27 @@ main {
   align-items: center;
 }
 
-.control-value {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--accent);
-  min-width: 44px;
-  text-align: right;
+.zoom-value-wrap {
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
+
+#zoom-input {
+  width: 52px;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface2);
+  color: var(--accent);
+  font-size: .95rem;
+  font-weight: 700;
+  text-align: right;
+  -moz-appearance: textfield;
+}
+#zoom-input:focus { outline: 1.5px solid var(--accent); border-color: var(--accent); }
+#zoom-input::-webkit-outer-spin-button,
+#zoom-input::-webkit-inner-spin-button { -webkit-appearance: none; }
 
 .slider-row {
   display: flex;
@@ -393,6 +407,79 @@ input[type="radio"] { accent-color: var(--accent); }
 }
 
 .divider { height: 1px; background: var(--border); }
+
+/* ── Fond ─────────────────────────────────────────────────────── */
+.bg-type-tabs {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+}
+.bg-tab {
+  flex: 1;
+  padding: .4rem;
+  font-size: .8rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.bg-tab.active { background: var(--accent); color: #fff; }
+
+.color-presets {
+  display: flex;
+  gap: .4rem;
+  flex-wrap: wrap;
+  margin-top: .5rem;
+}
+.color-preset {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: transform .1s, border-color .1s;
+  flex-shrink: 0;
+  padding: 0;
+}
+.color-preset:hover { transform: scale(1.15); border-color: var(--accent); }
+
+.color-picker-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: .5rem;
+  cursor: pointer;
+}
+input[type="color"] {
+  width: 40px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 2px 3px;
+  background: var(--surface2);
+}
+
+.bg-image-name {
+  font-size: .73rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: .3rem;
+}
+
+.slider-val {
+  font-weight: 400;
+  color: var(--accent);
+}
 
 /* ── Buttons ──────────────────────────────────────────────────────── */
 .btn {

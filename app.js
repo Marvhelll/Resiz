@@ -6,6 +6,14 @@ const state = {
   exportSize: 1080,
   PREVIEW_SIZE: 480,
   THUMB_SIZE: 68,
+  bg: {
+    type: 'color',   // 'color' | 'image'
+    color: '#ffffff',
+    img: null,
+    size: 100,       // % de cover
+    rotation: 0,     // degrés
+    blur: 0,         // px
+  },
 };
 
 /* ── Éléments DOM ───────────────────────────────────────────────────────── */
@@ -23,7 +31,7 @@ const carouselNav   = document.getElementById('carousel-nav');
 const canvas        = document.getElementById('preview');
 const ctx           = canvas.getContext('2d');
 const zoomSlider    = document.getElementById('zoom-slider');
-const zoomLabel     = document.getElementById('zoom-label');
+const zoomInput     = document.getElementById('zoom-input');
 const btnResetZoom  = document.getElementById('btn-reset-zoom');
 const exportSelect  = document.getElementById('export-size');
 const customWrapper = document.getElementById('custom-size-wrapper');
@@ -33,6 +41,20 @@ const btnZipLabel   = document.getElementById('btn-zip-label');
 const btnSingle     = document.getElementById('btn-single');
 const exportInfo    = document.getElementById('export-info');
 const btnInstall    = document.getElementById('btn-install');
+const bgTabColor    = document.getElementById('bg-tab-color');
+const bgTabImage    = document.getElementById('bg-tab-image');
+const bgColorPanel  = document.getElementById('bg-color-panel');
+const bgImagePanel  = document.getElementById('bg-image-panel');
+const bgColorInput  = document.getElementById('bg-color');
+const btnPickBg     = document.getElementById('btn-pick-bg');
+const fileInputBg   = document.getElementById('file-input-bg');
+const bgImageName   = document.getElementById('bg-image-name');
+const bgSizeSlider  = document.getElementById('bg-size');
+const bgSizeVal     = document.getElementById('bg-size-val');
+const bgRotSlider   = document.getElementById('bg-rotation');
+const bgRotVal      = document.getElementById('bg-rotation-val');
+const bgBlurSlider  = document.getElementById('bg-blur');
+const bgBlurVal     = document.getElementById('bg-blur-val');
 
 /* ── Chargement des fichiers ────────────────────────────────────────────── */
 async function loadFiles(fileList) {
@@ -149,6 +171,29 @@ function updateCarousel() {
   carouselNav.style.visibility = total > 1 ? 'visible' : 'hidden';
 }
 
+/* ── Fond ────────────────────────────────────────────────────────────────── */
+function drawBackground(c, size) {
+  const bg = state.bg;
+  if (bg.type === 'color') {
+    c.fillStyle = bg.color;
+    c.fillRect(0, 0, size, size);
+    return;
+  }
+  c.fillStyle = '#ffffff';
+  c.fillRect(0, 0, size, size);
+  if (!bg.img) return;
+  c.save();
+  c.filter = bg.blur > 0 ? `blur(${bg.blur}px)` : 'none';
+  c.translate(size / 2, size / 2);
+  c.rotate((bg.rotation * Math.PI) / 180);
+  const coverScale = Math.max(size / bg.img.naturalWidth, size / bg.img.naturalHeight);
+  const scale = coverScale * (bg.size / 100);
+  const w = bg.img.naturalWidth * scale;
+  const h = bg.img.naturalHeight * scale;
+  c.drawImage(bg.img, -w / 2, -h / 2, w, h);
+  c.restore();
+}
+
 /* ── Rendu canvas principal ─────────────────────────────────────────────── */
 function fitScale(img, size) {
   return Math.min(size / img.naturalWidth, size / img.naturalHeight);
@@ -158,8 +203,7 @@ function renderPreview() {
   const size = state.PREVIEW_SIZE;
   canvas.width = size;
   canvas.height = size;
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, size, size);
+  drawBackground(ctx, size);
 
   if (!state.items.length) return;
   const { img } = state.items[state.currentIndex];
@@ -175,8 +219,7 @@ function renderToBlob(img, size, format) {
     const off = document.createElement('canvas');
     off.width = size; off.height = size;
     const c = off.getContext('2d');
-    c.fillStyle = '#ffffff';
-    c.fillRect(0, 0, size, size);
+    drawBackground(c, size);
     const scale = fitScale(img, size) * (state.zoomPercent / 100);
     const drawW = img.naturalWidth  * scale;
     const drawH = img.naturalHeight * scale;
@@ -237,9 +280,9 @@ function download(blob, filename) {
 }
 
 function setZoom(value) {
-  state.zoomPercent    = value;
-  zoomSlider.value     = value;
-  zoomLabel.textContent = `${value}%`;
+  state.zoomPercent = value;
+  zoomSlider.value  = value;
+  zoomInput.value   = value;
 }
 
 function updateZipLabel() {
@@ -297,6 +340,17 @@ zoomSlider.addEventListener('input', () => {
   setZoom(parseInt(zoomSlider.value, 10));
   renderPreview();
 });
+
+zoomInput.addEventListener('input', () => {
+  const v = parseInt(zoomInput.value, 10);
+  if (v >= 10 && v <= 200) { setZoom(v); renderPreview(); }
+});
+
+zoomInput.addEventListener('change', () => {
+  const v = Math.max(10, Math.min(200, parseInt(zoomInput.value, 10) || 100));
+  setZoom(v); renderPreview();
+});
+
 btnResetZoom.addEventListener('click', () => { setZoom(100); renderPreview(); });
 
 /* ── Taille d'export ────────────────────────────────────────────────────── */
@@ -324,6 +378,71 @@ btnSingle.addEventListener('click', exportSingle);
 /* ── Init ────────────────────────────────────────────────────────────────── */
 updateExportInfo();
 updateZipLabel();
+
+/* ── Fond ────────────────────────────────────────────────────────────────── */
+bgTabColor.addEventListener('click', () => {
+  state.bg.type = 'color';
+  bgTabColor.classList.add('active');
+  bgTabImage.classList.remove('active');
+  bgColorPanel.hidden = false;
+  bgImagePanel.hidden = true;
+  renderPreview();
+});
+
+bgTabImage.addEventListener('click', () => {
+  state.bg.type = 'image';
+  bgTabImage.classList.add('active');
+  bgTabColor.classList.remove('active');
+  bgColorPanel.hidden = true;
+  bgImagePanel.hidden = false;
+  renderPreview();
+});
+
+document.querySelectorAll('.color-preset').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state.bg.color = btn.dataset.color;
+    bgColorInput.value = btn.dataset.color;
+    renderPreview();
+  });
+});
+
+bgColorInput.addEventListener('input', () => {
+  state.bg.color = bgColorInput.value;
+  renderPreview();
+});
+
+btnPickBg.addEventListener('click', () => fileInputBg.click());
+fileInputBg.addEventListener('change', () => {
+  const file = fileInputBg.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    URL.revokeObjectURL(url);
+    state.bg.img = img;
+    bgImageName.textContent = file.name;
+    renderPreview();
+  };
+  img.src = url;
+});
+
+bgSizeSlider.addEventListener('input', () => {
+  state.bg.size = parseInt(bgSizeSlider.value, 10);
+  bgSizeVal.textContent = `${state.bg.size}%`;
+  renderPreview();
+});
+
+bgRotSlider.addEventListener('input', () => {
+  state.bg.rotation = parseInt(bgRotSlider.value, 10);
+  bgRotVal.textContent = `${state.bg.rotation}°`;
+  renderPreview();
+});
+
+bgBlurSlider.addEventListener('input', () => {
+  state.bg.blur = parseInt(bgBlurSlider.value, 10);
+  bgBlurVal.textContent = `${state.bg.blur} px`;
+  renderPreview();
+});
 
 /* ── PWA install ─────────────────────────────────────────────────────────── */
 let deferredPrompt = null;
